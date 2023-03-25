@@ -1,7 +1,26 @@
 #!/bin/bash
 
 #Network Folder Name
-cd Final
+docker stop $(docker ps -aq)
+docker rm $(docker ps -aq)
+docker ps -a
+
+cd ..
+
+rm -Rf fabric-samples
+
+echo "============================Deleting Previous Docker Images============================"
+docker system prune --volumes 
+
+docker system prune -a
+
+echo "============================Downloading Fabric Samples============================"
+curl -sSL https://bit.ly/2ysbOFE | bash -s --
+
+echo "Fabric Samples::::::::"
+pwd
+
+cd Fabric/hlf-network
 
 
 #Start the Network
@@ -19,7 +38,7 @@ sleep 3
 
 
 #-----Chaincode Deployment-----
-cd ../chaincode/fabcar/go && GO111MODULE=on go mod vendor && cd ../../../Final
+cd ../chaincode/fabcar/go && GO111MODULE=on go mod vendor && cd ../../../hlf-network
 
 echo "============================Compile Chaincode============================"
 sleep 3
