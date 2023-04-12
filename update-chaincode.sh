@@ -1,10 +1,11 @@
 #!/bin/bash
 
 #Network Folder Name
-cd Final
+cd hlf-network
 
 #-----Chaincode Deployment-----
-cd ../chaincode/fabcar/go && GO111MODULE=on go mod vendor && cd ../../../Final
+cd ../chaincode/fabcar/go && GO111MODULE=on 
+sudo go mod vendor && cd ../../../hlf-network
 
 echo "============================Compile Chaincode============================"
 sleep 3
@@ -12,7 +13,7 @@ sleep 3
 #Package Chaincode
 export PATH=${PWD}/../bin:${PWD}:$PATH
 export FABRIC_CFG_PATH=$PWD/../config/
-VERSION=1
+VERSION=2
 
 echo -n "Chaincode Name: "
 read chaincodeName
@@ -67,9 +68,7 @@ read packageId
 CC_PACKAGE_ID=$packageId
 
 
-peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel 
---name ${chaincodeName} --version ${VERSION} --package-id $CC_PACKAGE_ID --sequence ${VERSION} --tls true --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name ${chaincodeName} --version ${VERSION} --package-id $CC_PACKAGE_ID --sequence ${VERSION} --tls true --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 
 
@@ -88,50 +87,34 @@ read packageId
 
 CC_PACKAGE_ID=$packageId
 
-peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel 
---name ${chaincodeName} --version ${VERSION} --package-id $CC_PACKAGE_ID --sequence ${VERSION} --tls true --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer lifecycle chaincode approveformyorg -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name ${chaincodeName} --version ${VERSION} --package-id $CC_PACKAGE_ID --sequence ${VERSION} --tls true --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 
 echo "============================Approve Chaincode============================"
 sleep 3
 
 
 #Check Commit Ready
-peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name ${chaincodeName} --version ${VERSION} --sequence ${VERSION} --tls true --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --output 
-json
+peer lifecycle chaincode checkcommitreadiness --channelID mychannel --name ${chaincodeName} --version ${VERSION} --sequence ${VERSION} --tls true --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --output json
 
 echo "============================Chaincode Ready to Commit============================"
 sleep 3
 
 #Commit Chaincode
-peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name 
-${chaincodeName} --version ${VERSION} --sequence ${VERSION} --tls true --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem 
---peerAddresses localhost:7051 --tlsRootCertFiles 
-${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 
---tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
+peer lifecycle chaincode commit -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --channelID mychannel --name fabcar --version ${VERSION} --sequence ${VERSION} --tls true --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt
 
 echo "============================Chaincode Commit Successful============================"
 sleep 3
 
 #Check Commit Status
-peer lifecycle chaincode querycommitted --channelID mychannel --name ${chaincodeName} --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+peer lifecycle chaincode querycommitted --channelID mychannel --name fabcar --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
 sleep 2
-
 
 #Invoke Chaincode
 peer chaincode query -C mychannel -n $chaincodeName -c '{"Args":["queryAllCars"]}'
 sleep 3
 
 
-peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls true --cafile 
-${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C 
-mychannel -n ${chaincodeName} --peerAddresses localhost:7051 --tlsRootCertFiles 
-${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 
---tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c 
-'{"function":"initLedger","Args":[]}'
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls true --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n fabcar --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c '{"function":"initLedger","Args":[]}'
 
 echo "============================Chaincode Invoke Successful============================"
 sleep 3
@@ -139,4 +122,4 @@ sleep 3
 
 
 #Success
-echo "Network Setup Successfully.."
+echo "Chaincode Upgraded Successfully.."

@@ -1,30 +1,38 @@
 #!/bin/bash
 
-#Network Folder Name
-docker stop $(docker ps -aq)
-docker rm $(docker ps -aq)
-docker ps -a
+echo "Do you want to Download new Fabric Samples? [y/n]"
+read response
+if [ $response == "y" ]
+then
+   #Network Folder Name
+    docker stop $(docker ps -aq)
+    docker rm $(docker ps -aq)
+    docker ps -a
 
-cd ..
+    cd ..
 
-rm -Rf fabric-samples
+    sudo rm -Rf fabric-samples
 
-echo "============================Deleting Previous Docker Images============================"
-docker system prune --volumes 
+    echo "============================Deleting Previous Docker Images============================"
+    docker system prune --volumes 
 
-docker system prune -a
+    docker system prune -a
 
-echo "============================Downloading Fabric Samples============================"
-curl -sSL https://bit.ly/2ysbOFE | bash -s --
+    echo "============================Downloading Fabric Samples============================"
+    curl -sSL https://bit.ly/2ysbOFE | bash -s --
 
-echo "Fabric Samples::::::::"
-pwd
+    echo "Fabric Samples::::::::"
+    pwd
+    cd Fabric/hlf-network
+else
+   cd hlf-network
+fi
 
-cd Fabric/hlf-network
 
 
 #Start the Network
-./network.sh down && ./network.sh up
+sudo ./network.sh down 
+./network.sh up
 
 echo "============================Network is started============================"
 sleep 3
@@ -38,7 +46,8 @@ sleep 3
 
 
 #-----Chaincode Deployment-----
-cd ../chaincode/fabcar/go && GO111MODULE=on go mod vendor && cd ../../../hlf-network
+cd ../chaincode/fabcar/go
+sudo GO111MODULE=on go mod vendor && cd ../../../hlf-network
 
 echo "============================Compile Chaincode============================"
 sleep 3
@@ -56,7 +65,7 @@ peer lifecycle chaincode package $chaincodeName.tar.gz --path ../chaincode/fabca
 echo "============================Package Chaincode ($chaincodeName.tar.gz)============================"
 sleep 1
 
-
+pwd
 
 #Install Chaincode
 export CORE_PEER_TLS_ENABLED=true
